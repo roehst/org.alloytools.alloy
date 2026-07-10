@@ -6,7 +6,7 @@ info:
     API for running Alloy models via MCP-compatible operations, including
     satisfiability checks and retrieval of generated instances.
 servers:
-  - url: https://example.invalid
+  - url: http://localhost:8080
 tags:
   - name: Execution
     description: Submit and inspect Alloy command executions.
@@ -188,16 +188,28 @@ components:
           properties:
             solver:
               type: string
+              description: >
+                Alloy solver identifier supported by the server
+                (for example `SAT4J`).
             bitwidth:
               type: integer
+              minimum: 1
+              description: Integer bit width used by Alloy.
             unrolls:
               type: integer
+              minimum: -1
+              description: Recursion unrolling depth (`-1` lets Alloy choose).
             symmetry:
               type: integer
+              minimum: 0
+              description: Symmetry-breaking level.
             skolemDepth:
               type: integer
+              minimum: 0
+              description: Maximum skolemization depth.
             noOverflow:
               type: boolean
+              description: Whether arithmetic overflow is disallowed.
     ExecutionRecord:
       type: object
       required: [executionId, status, command, createdAt]
