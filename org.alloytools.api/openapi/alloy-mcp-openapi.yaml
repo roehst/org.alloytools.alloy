@@ -152,7 +152,7 @@ components:
           type: integer
           minimum: 0
           default: 1
-          description: Number of solutions to collect per command (0 means as many as available)
+          description: Number of solutions to collect per command (0 means unbounded/next-until-unsat, matching Alloy CLI semantics)
         options:
           $ref: '#/components/schemas/SolverOptions'
 
@@ -168,16 +168,20 @@ components:
         symmetry:
           type: integer
           default: 20
+          description: Symmetry-breaking effort level passed to Alloy; higher values may reduce redundant instances at higher solving cost
         unrolls:
           type: integer
           default: -1
         skolemDepth:
           type: integer
           default: 0
+          description: Skolemization depth used by Alloy when materializing skolem relations in results
         coreGranularity:
           type: integer
+          description: Unsat-core granularity option forwarded to the Alloy solver
         coreMinimization:
           type: integer
+          description: Unsat-core minimization strategy value forwarded to the Alloy solver
         inferPartialInstance:
           type: boolean
           default: false
@@ -209,6 +213,7 @@ components:
         timestamp:
           type: integer
           format: int64
+          description: Execution creation time as Unix epoch milliseconds
         noOverflow:
           type: boolean
         symmetry:
@@ -255,6 +260,7 @@ components:
             type: string
         expects:
           type: integer
+          description: Expected satisfiability for the command (0 expects UNSAT, 1 expects SAT)
         maxseq:
           type: integer
         maxprefix:
@@ -300,6 +306,7 @@ components:
         utctime:
           type: integer
           format: int64
+          description: Solution generation time as Unix epoch milliseconds
         incremental:
           type: boolean
         sigs:
@@ -333,6 +340,7 @@ components:
             $ref: '#/components/schemas/Tuples'
         state:
           type: integer
+          description: Trace state index for temporal solutions; -1 when not part of a temporal trace
         messages:
           type: array
           items:
