@@ -242,8 +242,10 @@ components:
         completedAt:
           type: string
           format: date-time
+          nullable: true
         sat:
-          type: [boolean, 'null']
+          type: boolean
+          nullable: true
           description: >
             Satisfiability result when execution completed; null while queued,
             running, or when no SAT result is available.
@@ -265,16 +267,15 @@ components:
           type: string
           description: Scope declaration used for the command execution.
         expects:
-          type: integer
-          description: Expected satisfiability (0 for UNSAT expectation, 1 for SAT expectation).
+          type: string
+          enum: [sat, unsat]
+          description: Expected satisfiability declared by the command.
     CheckResult:
       allOf:
         - $ref: '#/components/schemas/ExecutionRecord'
         - type: object
           required: [sat]
           properties:
-            sat:
-              type: boolean
             message:
               type: string
     RunResult:
@@ -283,11 +284,6 @@ components:
         - type: object
           required: [sat, instanceCount]
           properties:
-            sat:
-              type: boolean
-            instanceCount:
-              type: integer
-              minimum: 0
             instances:
               type: array
               items:
