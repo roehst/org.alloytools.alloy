@@ -202,8 +202,8 @@ components:
                 Alloy solver identifier supported by the server
                 (availability depends on platform and installation). The value
                 must match a SATFactory id (for example, `lingeling.parallel`
-                is the canonical id for the parallel Lingeling variant; `yices`
-                is JNI-backed while `yices.external` delegates to an external
+                is currently the Lingeling option exposed by Alloy; `yices` is
+                JNI-backed while `yices.external` delegates to an external
                 executable).
             bitwidth:
               type: integer
@@ -213,7 +213,9 @@ components:
             unrolls:
               type: integer
               minimum: -1
-              description: Recursion unrolling depth (`-1` lets Alloy choose).
+              description: >
+                Recursion unrolling depth (`-1` lets Alloy choose, `0` disables
+                unrolling, positive values enforce a specific depth).
             symmetry:
               type: integer
               minimum: 0
@@ -273,7 +275,10 @@ components:
         expects:
           type: string
           enum: [sat, unsat]
-          description: Expected satisfiability declared by the command.
+          description: >
+            Optional expected satisfiability declared by the command; a mismatch
+            between expectation and actual result is treated as an execution
+            failure condition by Alloy tooling.
     CheckResult:
       allOf:
         - $ref: '#/components/schemas/ExecutionRecord'
