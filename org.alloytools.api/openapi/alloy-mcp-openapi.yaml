@@ -178,17 +178,17 @@ components:
         unrolls:
           type: integer
           default: -1
-          description: Recursion unroll limit forwarded to Alloy; -1 means use Alloy default behavior
+          description: Recursion unroll limit; -1 means use Alloy default behavior
         skolemDepth:
           type: integer
           default: 0
           description: Skolemization depth used by Alloy when materializing skolem relations in results
         coreGranularity:
           type: integer
-          description: Unsat-core granularity option forwarded to the Alloy solver
+          description: Unsat-core granularity level
         coreMinimization:
           type: integer
-          description: Unsat-core minimization strategy value forwarded to the Alloy solver
+          description: Unsat-core minimization strategy level
         inferPartialInstance:
           type: boolean
           default: false
@@ -317,7 +317,7 @@ components:
         utctime:
           type: integer
           format: int64
-          description: Solution generation time as Unix epoch milliseconds
+          description: Solution generation time as Unix epoch milliseconds (legacy Alloy DTO field name)
         incremental:
           type: boolean
         sigs:
