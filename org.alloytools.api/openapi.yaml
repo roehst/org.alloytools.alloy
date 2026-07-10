@@ -200,7 +200,11 @@ components:
                 - yices.external
               description: >
                 Alloy solver identifier supported by the server
-                (availability depends on platform and installation).
+                (availability depends on platform and installation). The value
+                must match a SATFactory id (for example, `lingeling.parallel`
+                is the canonical id for the parallel Lingeling variant; `yices`
+                is JNI-backed while `yices.external` delegates to an external
+                executable).
             bitwidth:
               type: integer
               minimum: 1
@@ -341,7 +345,9 @@ components:
                 type: array
                 items:
                   type: string
-          description: sig -> field -> tuple rows
+          description: >
+            Nested relation data keyed by signature name, then field name; each
+            field value is an array of tuple rows.
         skolems:
           type: object
           additionalProperties:
