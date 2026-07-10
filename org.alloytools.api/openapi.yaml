@@ -243,9 +243,7 @@ components:
           type: string
           format: date-time
         sat:
-          oneOf:
-            - type: boolean
-            - type: 'null'
+          type: [boolean, 'null']
           description: >
             Satisfiability result when execution completed; null while queued,
             running, or when no SAT result is available.
@@ -265,8 +263,10 @@ components:
           type: string
         scope:
           type: string
+          description: Scope declaration used for the command execution.
         expects:
           type: integer
+          description: Expected satisfiability (0 for UNSAT expectation, 1 for SAT expectation).
     CheckResult:
       allOf:
         - $ref: '#/components/schemas/ExecutionRecord'
@@ -332,6 +332,7 @@ components:
           description: Temporal trace state index, or -1 for non-temporal.
         messages:
           type: array
+          description: Informational or warning messages associated with this instance.
           items:
             type: string
         values:
