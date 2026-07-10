@@ -152,7 +152,7 @@ components:
           type: integer
           minimum: 0
           default: 1
-          description: Number of solutions to collect per command. Special value 0 means unbounded (next-until-unsat), matching Alloy CLI semantics
+          description: Number of solutions to collect per command. Special value 0 means continue generating instances until no additional satisfying instance exists (matching Alloy CLI semantics)
         options:
           $ref: '#/components/schemas/SolverOptions'
 
@@ -167,8 +167,9 @@ components:
           default: false
         symmetry:
           type: integer
+          minimum: 0
           default: 20
-          description: Symmetry-breaking effort level passed to Alloy; higher values may reduce redundant instances at higher solving cost
+          description: Non-negative symmetry-breaking effort level passed to Alloy (0 disables symmetry breaking; common values are in the low tens, default 20)
         unrolls:
           type: integer
           default: -1
@@ -343,7 +344,7 @@ components:
             $ref: '#/components/schemas/Tuples'
         state:
           type: integer
-          description: Trace state index for temporal solutions; -1 when not part of a temporal trace
+          description: Trace state index for this instance in temporal solutions; -1 means this instance is non-temporal (distinct from Solution.loopstate semantics)
         messages:
           type: array
           items:
