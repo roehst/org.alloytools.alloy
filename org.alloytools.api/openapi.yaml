@@ -1,0 +1,343 @@
+openapi: 3.1.0
+info:
+  title: Alloy MCP Execution API
+  version: 0.1.0
+  description: >
+    API for running Alloy models via MCP-compatible operations, including
+    satisfiability checks and retrieval of generated instances.
+servers:
+  - url: https://example.invalid
+tags:
+  - name: Execution
+    description: Submit and inspect Alloy command executions.
+  - name: Instances
+    description: Retrieve Alloy instances produced by a run command.
+paths:
+  /v1/models/check:
+    post:
+      tags: [Execution]
+      operationId: checkModel
+      summary: Check an Alloy model command for satisfiability.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExecuteRequest'
+      responses:
+        '200':
+          description: Check completed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CheckResult'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          $ref: '#/components/responses/ModelError'
+  /v1/models/run:
+    post:
+      tags: [Execution]
+      operationId: runModel
+      summary: Run an Alloy model command and generate instances.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExecuteRequest'
+      responses:
+        '200':
+          description: Run completed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RunResult'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          $ref: '#/components/responses/ModelError'
+  /v1/executions/{executionId}:
+    get:
+      tags: [Execution]
+      operationId: getExecution
+      summary: Get metadata and status for a previous execution.
+      parameters:
+        - $ref: '#/components/parameters/ExecutionId'
+      responses:
+        '200':
+          description: Execution metadata.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExecutionRecord'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /v1/executions/{executionId}/instances:
+    get:
+      tags: [Instances]
+      operationId: listInstances
+      summary: List generated instances for an execution.
+      parameters:
+        - $ref: '#/components/parameters/ExecutionId'
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+      responses:
+        '200':
+          description: Instance page.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstancePage'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /v1/executions/{executionId}/instances/{instanceIndex}:
+    get:
+      tags: [Instances]
+      operationId: getInstance
+      summary: Get a single Alloy instance by index.
+      parameters:
+        - $ref: '#/components/parameters/ExecutionId'
+        - name: instanceIndex
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+      responses:
+        '200':
+          description: Instance found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstanceResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+components:
+  parameters:
+    ExecutionId:
+      name: executionId
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Server-generated execution identifier.
+  responses:
+    BadRequest:
+      description: Request failed validation.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    ModelError:
+      description: Alloy parse/type/solver error.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: Resource not found.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+  schemas:
+    ExecuteRequest:
+      type: object
+      required: [model, command]
+      properties:
+        model:
+          type: object
+          required: [source]
+          properties:
+            source:
+              type: string
+              description: Full Alloy module source text.
+            path:
+              type: string
+              description: Optional logical path/name for the source.
+        command:
+          type: object
+          required: [type]
+          properties:
+            type:
+              type: string
+              enum: [check, run]
+            name:
+              type: string
+              description: Command label to execute; defaults to first matching type.
+            maxInstances:
+              type: integer
+              minimum: 1
+              default: 1
+        options:
+          type: object
+          properties:
+            solver:
+              type: string
+            bitwidth:
+              type: integer
+            unrolls:
+              type: integer
+            symmetry:
+              type: integer
+            skolemDepth:
+              type: integer
+            noOverflow:
+              type: boolean
+    ExecutionRecord:
+      type: object
+      required: [executionId, status, command, createdAt]
+      properties:
+        executionId:
+          type: string
+        status:
+          type: string
+          enum: [queued, running, completed, failed]
+        command:
+          $ref: '#/components/schemas/CommandSummary'
+        createdAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: string
+          format: date-time
+        sat:
+          type: boolean
+          nullable: true
+        instanceCount:
+          type: integer
+          minimum: 0
+        solver:
+          type: string
+    CommandSummary:
+      type: object
+      required: [type]
+      properties:
+        type:
+          type: string
+          enum: [check, run]
+        name:
+          type: string
+        scope:
+          type: string
+        expects:
+          type: integer
+    CheckResult:
+      allOf:
+        - $ref: '#/components/schemas/ExecutionRecord'
+        - type: object
+          required: [sat]
+          properties:
+            sat:
+              type: boolean
+            message:
+              type: string
+    RunResult:
+      allOf:
+        - $ref: '#/components/schemas/ExecutionRecord'
+        - type: object
+          required: [sat, instanceCount]
+          properties:
+            sat:
+              type: boolean
+            instanceCount:
+              type: integer
+              minimum: 0
+            instances:
+              type: array
+              items:
+                $ref: '#/components/schemas/Instance'
+              description: Optional inlined first page of instances.
+    InstancePage:
+      type: object
+      required: [executionId, total, items]
+      properties:
+        executionId:
+          type: string
+        total:
+          type: integer
+          minimum: 0
+        offset:
+          type: integer
+          minimum: 0
+        limit:
+          type: integer
+          minimum: 1
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Instance'
+    InstanceResponse:
+      type: object
+      required: [executionId, index, instance]
+      properties:
+        executionId:
+          type: string
+        index:
+          type: integer
+          minimum: 0
+        instance:
+          $ref: '#/components/schemas/Instance'
+    Instance:
+      type: object
+      properties:
+        state:
+          type: integer
+          description: Temporal trace state index, or -1 for non-temporal.
+        messages:
+          type: array
+          items:
+            type: string
+        values:
+          type: object
+          additionalProperties:
+            type: object
+            additionalProperties:
+              type: array
+              items:
+                type: array
+                items:
+                  type: string
+          description: sig -> field -> tuple rows
+        skolems:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/Tuples'
+    Tuples:
+      type: object
+      required: [arity, data]
+      properties:
+        arity:
+          type: integer
+          minimum: 0
+        data:
+          type: array
+          items:
+            type: array
+            items:
+              type: string
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+        code:
+          type: string
+        details:
+          type: object
+          additionalProperties: true
