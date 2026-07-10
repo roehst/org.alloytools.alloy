@@ -152,7 +152,7 @@ components:
           type: integer
           minimum: 0
           default: 1
-          description: Number of solutions to collect per command (0 means unbounded/next-until-unsat, matching Alloy CLI semantics)
+          description: Number of solutions to collect per command. Special value 0 means unbounded (next-until-unsat), matching Alloy CLI semantics
         options:
           $ref: '#/components/schemas/SolverOptions'
 
@@ -260,6 +260,7 @@ components:
             type: string
         expects:
           type: integer
+          enum: [0, 1]
           description: Expected satisfiability for the command (0 expects UNSAT, 1 expects SAT)
         maxseq:
           type: integer
@@ -303,6 +304,7 @@ components:
         loopstate:
           type: integer
           default: -1
+          description: Index of the loop-back state in temporal traces; -1 means no loop (non-temporal or unsatisfied case)
         utctime:
           type: integer
           format: int64
@@ -316,6 +318,7 @@ components:
         duration:
           type: integer
           format: int64
+          description: Solve duration in milliseconds
         localtime:
           type: string
         timezone:
