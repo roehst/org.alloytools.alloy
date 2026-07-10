@@ -188,9 +188,19 @@ components:
           properties:
             solver:
               type: string
+              enum:
+                - sat4j
+                - sat4j.light
+                - sat4j.pmax
+                - minisat
+                - minisat.prover
+                - glucose
+                - lingeling.parallel
+                - yices
+                - yices.external
               description: >
                 Alloy solver identifier supported by the server
-                (for example `SAT4J`).
+                (availability depends on platform and installation).
             bitwidth:
               type: integer
               minimum: 1
@@ -233,8 +243,12 @@ components:
           type: string
           format: date-time
         sat:
-          type: boolean
-          nullable: true
+          oneOf:
+            - type: boolean
+            - type: 'null'
+          description: >
+            Satisfiability result when execution completed; null while queued,
+            running, or when no SAT result is available.
         instanceCount:
           type: integer
           minimum: 0
