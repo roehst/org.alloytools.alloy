@@ -201,10 +201,10 @@ components:
               description: >
                 Alloy solver identifier supported by the server
                 (availability depends on platform and installation). The value
-                must match a SATFactory id (for example, `lingeling.parallel`
-                is currently the Lingeling option exposed by Alloy; `yices` is
+                must match a SATFactory id. Servers may expose only a subset of
+                this enum and should reject unsupported values. `yices` is
                 JNI-backed while `yices.external` delegates to an external
-                executable).
+                executable.
             bitwidth:
               type: integer
               minimum: 1
@@ -212,10 +212,12 @@ components:
               description: Integer bit width used by Alloy (typically 1-32).
             unrolls:
               type: integer
+              nullable: true
               minimum: -1
               description: >
                 Recursion unrolling depth (`-1` lets Alloy choose, `0` disables
-                unrolling, positive values enforce a specific depth).
+                unrolling, positive values enforce a specific depth). If
+                omitted, the server default is used.
             symmetry:
               type: integer
               minimum: 0
@@ -334,7 +336,8 @@ components:
         state:
           type: integer
           minimum: -1
-          description: Temporal trace state index, or -1 for non-temporal.
+          description: >
+            Temporal trace state index; `-1` is the NON_TEMPORAL sentinel value.
         messages:
           type: array
           description: Informational or warning messages associated with this instance.
