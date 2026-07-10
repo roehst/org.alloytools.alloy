@@ -194,7 +194,8 @@ components:
             bitwidth:
               type: integer
               minimum: 1
-              description: Integer bit width used by Alloy.
+              maximum: 32
+              description: Integer bit width used by Alloy (typically 1-32).
             unrolls:
               type: integer
               minimum: -1
@@ -202,11 +203,15 @@ components:
             symmetry:
               type: integer
               minimum: 0
-              description: Symmetry-breaking level.
+              description: >
+                Symmetry-breaking effort; larger values allow stronger symmetry
+                pruning at additional solving cost.
             skolemDepth:
               type: integer
               minimum: 0
-              description: Maximum skolemization depth.
+              description: >
+                Maximum depth for skolemization during analysis; larger values
+                can expose deeper witness structure.
             noOverflow:
               type: boolean
               description: Whether arithmetic overflow is disallowed.
@@ -309,6 +314,7 @@ components:
       properties:
         state:
           type: integer
+          minimum: -1
           description: Temporal trace state index, or -1 for non-temporal.
         messages:
           type: array
