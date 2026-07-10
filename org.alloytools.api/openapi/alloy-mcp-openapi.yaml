@@ -152,7 +152,7 @@ components:
           type: integer
           minimum: 0
           default: 1
-          description: Number of solutions to collect per command; 0 means continue until no further satisfying instance exists
+          description: Number of results to collect per command; 0 means continue until no further result exists (instances for `run`, counterexamples for `check`)
         options:
           $ref: '#/components/schemas/SolverOptions'
 
@@ -169,10 +169,11 @@ components:
           type: integer
           minimum: 0
           default: 20
-          description: Non-negative symmetry-breaking effort level passed to Alloy (0 disables symmetry breaking)
+          description: Non-negative symmetry-breaking effort level passed to Alloy (0 disables symmetry breaking; upper bound is solver-dependent)
         unrolls:
           type: integer
           default: -1
+          description: Recursion unroll limit forwarded to Alloy; -1 means use Alloy default behavior
         skolemDepth:
           type: integer
           default: 0
@@ -305,7 +306,7 @@ components:
         loopstate:
           type: integer
           default: -1
-          description: Index of the loop-back state in a temporal trace; -1 means no loop-back state exists
+          description: Index of the loop-back state in a temporal trace; this is meaningful for temporal solutions only, and -1 means no loop-back state exists
         utctime:
           type: integer
           format: int64
@@ -344,7 +345,7 @@ components:
             $ref: '#/components/schemas/Tuples'
         state:
           type: integer
-          description: Trace state index of this instance in temporal solutions; -1 means the instance is non-temporal
+          description: Zero-based trace state index for temporal instances; -1 means the instance is non-temporal
         messages:
           type: array
           items:
